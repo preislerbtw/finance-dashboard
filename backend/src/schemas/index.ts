@@ -38,3 +38,7 @@ export const listQuerySchema = z.object({
 })
 
 export const summaryQuerySchema = z.object({ month })
+
+export const monthlyQuerySchema = z.object({
+  year: z.string().regex(/^\d{4}$/, 'Use o formato YYYY'),
+})

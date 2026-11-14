@@ -1,5 +1,5 @@
 import {
-  Category, CategoryTotal, NewTransaction, Transaction,
+  Category, CategoryTotal, MonthTotal, DayTotal, NewTransaction, Transaction,
   TransactionFilters, User,
 } from '../types'
 
@@ -22,6 +22,8 @@ export interface TransactionRepository {
   update(id: string, data: Partial<NewTransaction>): Promise<Transaction>
   delete(id: string): Promise<void>
   totalsByCategory(userId: string, month: string, tipo: 'receita' | 'despesa'): Promise<CategoryTotal[]>
+  totalsByMonth(userId: string, year: string): Promise<MonthTotal[]>
+  totalsByDay(userId: string, month: string): Promise<DayTotal[]>
 }
 
 export interface Repositories {

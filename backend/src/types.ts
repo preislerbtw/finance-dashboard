@@ -42,3 +42,14 @@ export interface CategoryTotal {
   categoryId: string
   total: number
 }
+
+export interface MonthTotal {
+  month: number
+  receitas: number
+  despesas: number
+}
+
+export interface DayTotal {
+  day: number
+  despesas: number
+}

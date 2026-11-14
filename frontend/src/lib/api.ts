@@ -1,4 +1,5 @@
 const TOKEN_KEY = 'finance:token'
+const USER_KEY = 'finance:user'
 
 export const tokenStorage = {
   get: () => localStorage.getItem(TOKEN_KEY),
@@ -29,6 +30,14 @@ export async function api<T>(
     })
   } catch {
     throw new ApiError(0, 'Não foi possível conectar ao servidor')
+  }
+
+  // sessao expirada ou inválida: limpa tudo e volta para o login
+  if (res.status === 401 && token && !path.startsWith('/auth/')) {
+    tokenStorage.clear()
+    localStorage.removeItem(USER_KEY)
+    window.location.assign('/login')
+    throw new ApiError(401, 'Sessão expirada')
   }
 
   if (res.status === 204) return undefined as T

@@ -1,55 +1,77 @@
 import { LayoutDashboard, LogOut, Receipt } from 'lucide-react'
+import { ReactNode } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Logo } from './AuthLayout'
 
 const links = [
   { to: '/', label: 'Visão geral', icon: LayoutDashboard, end: true },
   { to: '/transacoes', label: 'Transações', icon: Receipt, end: false },
 ]
 
+// rótulo que aparece ao passar o mouse sobre um ícone
+function Tip({ children }: { children: ReactNode }) {
+  return (
+    <span className="pointer-events-none absolute left-full z-10 ml-3 whitespace-nowrap rounded-lg bg-neutral-950 px-2.5 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100">
+      {children}
+    </span>
+  )
+}
+
 export default function AppLayout() {
   const { user, logout } = useAuth()
 
   return (
     <div className="min-h-screen">
-      {/* Sidebar (desktop) */}
-      <aside className="fixed inset-y-4 left-4 hidden w-60 flex-col justify-between rounded-3xl bg-neutral-950 p-5 text-white lg:flex">
-        <div>
-          <Logo dark />
-          <nav className="mt-10 space-y-1">
+      {/* Sidebar (desktop): trilho de ícones */}
+      <aside className="fixed inset-y-4 left-4 hidden w-16 flex-col justify-between lg:flex">
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-sm">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-500 text-lg font-bold text-white">
+              $
+            </div>
+          </div>
+
+          <nav className="flex w-16 flex-col items-center gap-2 rounded-full bg-white p-2 shadow-sm">
             {links.map(({ to, label, icon: Icon, end }) => (
               <NavLink
                 key={to}
                 to={to}
                 end={end}
+                aria-label={label}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition ${
-                    isActive ? 'bg-orange-500 font-medium text-white' : 'text-neutral-400 hover:bg-neutral-900 hover:text-white'
+                  `group relative flex h-11 w-11 items-center justify-center rounded-full transition ${
+                    isActive ? 'bg-neutral-950 text-white' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-950'
                   }`
                 }
               >
-                <Icon size={18} />
-                {label}
+                <Icon size={20} />
+                <Tip>{label}</Tip>
               </NavLink>
             ))}
           </nav>
         </div>
 
-        <div className="rounded-2xl bg-neutral-900 p-3">
-          <p className="truncate text-sm font-medium">{user?.nome}</p>
-          <p className="truncate text-xs text-neutral-500">{user?.email}</p>
+        <div className="flex w-16 flex-col items-center gap-2 rounded-full bg-white p-2 shadow-sm">
+          <div
+            title={user?.nome}
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-orange-100 text-sm font-semibold text-orange-700"
+          >
+            {/* {user?.nome.charAt(0).toUpperCase()} */}
+            J
+          </div>
           <button
             onClick={logout}
-            className="mt-3 flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-neutral-400 transition hover:bg-neutral-800 hover:text-white"
+            aria-label="Sair"
+            className="group relative flex h-11 w-11 items-center justify-center rounded-full text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-950"
           >
-            <LogOut size={16} /> Sair
+            <LogOut size={20} />
+            <Tip>Sair</Tip>
           </button>
         </div>
       </aside>
 
       {/* Conteúdo */}
-      <main className="px-4 pb-28 pt-6 lg:pb-10 lg:pl-72 lg:pr-6 lg:pt-8">
+      <main className="px-4 pb-28 pt-6 lg:pb-10 lg:pl-28 lg:pr-6 lg:pt-8">
         <Outlet />
       </main>
 

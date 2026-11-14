@@ -73,6 +73,28 @@ class InMemoryTransactionRepository implements TransactionRepository {
     }
     return [...totals].map(([categoryId, total]) => ({ categoryId, total })).sort((a, b) => b.total - a.total)
   }
+  async totalsByMonth(userId: string, year: string) {
+    const totals = new Map<number, { receitas: number; despesas: number }>()
+    for (const t of this.items) {
+      if (t.userId !== userId || !t.data.startsWith(year)) continue
+      const month = Number(t.data.slice(5, 7))
+      const entry = totals.get(month) ?? { receitas: 0, despesas: 0 }
+      if (t.tipo === 'receita') entry.receitas += t.valorCentavos
+      else entry.despesas += t.valorCentavos
+      totals.set(month, entry)
+    }
+    return [...totals].map(([month, v]) => ({ month, ...v }))
+  }
+  async totalsByDay(userId: string, month: string) {
+    const totals = new Map<number, number>()
+    for (const t of this.items) {
+      if (t.userId === userId && t.tipo === 'despesa' && t.data.startsWith(month)) {
+        const day = Number(t.data.slice(8, 10))
+        totals.set(day, (totals.get(day) ?? 0) + t.valorCentavos)
+      }
+    }
+    return [...totals].map(([day, despesas]) => ({ day, despesas }))
+  }
 }
 
 export function createInMemoryRepositories(): Repositories {

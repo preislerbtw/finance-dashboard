@@ -4,8 +4,8 @@ import { AuthLayout, ErrorMessage, Field, SubmitButton } from '../components/Aut
 import { useAuth } from '../context/AuthContext'
 import { ApiError } from '../lib/api'
 
-// Conta de teste, usada só pelo botão de desenvolvimento
-const DEMO = { nome: 'Pai (demo)', email: 'demo@teste.com', senha: '123456' }
+// conta de teste, usada só pelo botão de desenvolvimento
+const DEMO = { nome: 'Jorge', email: 'demo@teste.com', senha: '123456' }
 
 export default function Login() {
   const { login, register } = useAuth()
@@ -81,7 +81,7 @@ export default function Login() {
           disabled={loading}
           className="mt-3 w-full rounded-xl border border-dashed border-orange-400 bg-orange-50 py-2.5 text-sm font-medium text-orange-700 transition hover:bg-orange-100 disabled:opacity-60"
         >
-          Entrar como demo (só em desenvolvimento)
+          Entrar
         </button>
       )}
 

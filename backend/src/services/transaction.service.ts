@@ -61,4 +61,23 @@ export class TransactionService {
       receitasPorCategoria: withName(receitas),
     }
   }
+
+  // Receitas e despesas de cada mês do ano (sempre 12 itens)
+  async monthly(userId: string, year: string) {
+    const rows = await this.repos.transactions.totalsByMonth(userId, year)
+    return Array.from({ length: 12 }, (_, i) => {
+      const row = rows.find((r) => r.month === i + 1)
+      return { mes: i + 1, receitasCentavos: row?.receitas ?? 0, despesasCentavos: row?.despesas ?? 0 }
+    })
+  }
+
+  // Despesa de cada dia do mês (um item por dia, mesmo sem gasto)
+  async daily(userId: string, month: string) {
+    const [year, m] = month.split('-').map(Number)
+    const rows = await this.repos.transactions.totalsByDay(userId, month)
+    return Array.from({ length: new Date(year, m, 0).getDate() }, (_, i) => ({
+      dia: i + 1,
+      despesasCentavos: rows.find((r) => r.day === i + 1)?.despesas ?? 0,
+    }))
+  }
 }

@@ -1,8 +1,9 @@
 import { Router } from 'express'
+import { AppError } from '../errors'
 import { requireAuth } from '../middleware/auth'
 import { Repositories } from '../repositories/interfaces'
 import {
-  categorySchema, listQuerySchema, loginSchema, registerSchema,
+  categorySchema, listQuerySchema, loginSchema, monthlyQuerySchema, registerSchema,
   summaryQuerySchema, transactionSchema, transactionUpdateSchema,
 } from '../schemas'
 import { AuthService } from '../services/auth.service'
@@ -22,8 +23,13 @@ export function createRoutes(repos: Repositories) {
     res.json(await auth.login(loginSchema.parse(req.body)))
   })
 
-  // protected routes
+  // rotas protegidas
   router.use(requireAuth)
+  // token válido mas usuário inexistente (ex.: servidor reiniciou com dados em memória)
+  router.use(async (req, _res, next) => {
+    if (!(await repos.users.findById(req.userId))) throw new AppError(401, 'Sessão inválida. Entre novamente.')
+    next()
+  })
 
   router.get('/categories', async (req, res) => {
     res.json(await repos.categories.findByUser(req.userId))
@@ -52,6 +58,15 @@ export function createRoutes(repos: Repositories) {
   router.get('/dashboard/summary', async (req, res) => {
     const { month } = summaryQuerySchema.parse(req.query)
     res.json(await transactions.summary(req.userId, month))
+  })
+
+  router.get('/dashboard/monthly', async (req, res) => {
+    const { year } = monthlyQuerySchema.parse(req.query)
+    res.json(await transactions.monthly(req.userId, year))
+  })
+  router.get('/dashboard/daily', async (req, res) => {
+    const { month } = summaryQuerySchema.parse(req.query)
+    res.json(await transactions.daily(req.userId, month))
   })
 
   return router
