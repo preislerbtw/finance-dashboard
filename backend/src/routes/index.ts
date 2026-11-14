@@ -3,16 +3,18 @@ import { AppError } from '../errors'
 import { requireAuth } from '../middleware/auth'
 import { Repositories } from '../repositories/interfaces'
 import {
-  categorySchema, listQuerySchema, loginSchema, monthlyQuerySchema, registerSchema,
-  summaryQuerySchema, transactionSchema, transactionUpdateSchema,
+  categorySchema, categoryUpdateSchema, listQuerySchema, loginSchema, monthlyQuerySchema,
+  registerSchema, settingsSchema, summaryQuerySchema, transactionSchema, transactionUpdateSchema,
 } from '../schemas'
 import { AuthService } from '../services/auth.service'
+import { CategoryService } from '../services/category.service'
 import { TransactionService } from '../services/transaction.service'
 
 export function createRoutes(repos: Repositories) {
   const router = Router()
   const auth = new AuthService(repos)
   const transactions = new TransactionService(repos)
+  const categories = new CategoryService(repos)
 
   // auth
   router.post('/auth/register', async (req, res) => {
@@ -35,8 +37,22 @@ export function createRoutes(repos: Repositories) {
     res.json(await repos.categories.findByUser(req.userId))
   })
   router.post('/categories', async (req, res) => {
-    const data = categorySchema.parse(req.body)
-    res.status(201).json(await repos.categories.create({ ...data, userId: req.userId }))
+    res.status(201).json(await categories.create(req.userId, categorySchema.parse(req.body)))
+  })
+  router.put('/categories/:id', async (req, res) => {
+    const data = categoryUpdateSchema.parse(req.body)
+    res.json(await categories.update(req.userId, String(req.params.id), data))
+  })
+  router.delete('/categories/:id', async (req, res) => {
+    await categories.remove(req.userId, String(req.params.id))
+    res.status(204).send()
+  })
+
+  router.get('/settings', async (req, res) => {
+    res.json(await repos.settings.get(req.userId))
+  })
+  router.put('/settings', async (req, res) => {
+    res.json(await repos.settings.save(req.userId, settingsSchema.parse(req.body)))
   })
 
   router.get('/transactions', async (req, res) => {

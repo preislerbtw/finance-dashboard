@@ -53,3 +53,7 @@ export interface DayTotal {
   day: number
   despesas: number
 }
+
+export interface Settings {
+  limiteMensalCentavos: number
+}

@@ -4,13 +4,13 @@ import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts'
 import { Link } from 'react-router-dom'
+import LimitCard from '../components/LimitCard'
 import { useAuth } from '../context/AuthContext'
 import { brl, brlShort, currentMonth, formatDate } from '../lib/format'
 import { Category, DayPoint, MonthPoint, Summary, Transaction } from '../lib/types'
 import { useFetch } from '../lib/useFetch'
 
 const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
-const LIMITE_MENSAL = 400000 // R$ 4.000,00 (por enquanto fixo; depois vira configuração)
 
 function greeting() {
   const h = new Date().getHours()
@@ -29,7 +29,7 @@ function Card({ title, subtitle, children, className = '' }: { title: string; su
 
 function StatCard({ label, value, icon, highlight = false }: { label: string; value: string; icon: ReactNode; highlight?: boolean }) {
   return (
-    <div className={`rounded-3xl p-5 ${highlight ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white' : 'bg-white shadow-sm'}`}>
+    <div className={`rounded-3xl p-5 ${highlight ? 'bg-linear-to-br from-orange-400 to-orange-600 text-white' : 'bg-white shadow-sm'}`}>
       <div className="flex items-center justify-between">
         <span className={`text-sm ${highlight ? 'text-orange-50' : 'text-neutral-500'}`}>{label}</span>
         <span className={`flex h-9 w-9 items-center justify-center rounded-full ${highlight ? 'bg-white/20' : 'bg-neutral-100 text-neutral-700'}`}>
@@ -66,7 +66,6 @@ export default function Dashboard() {
   const receitas = summary?.totalReceitasCentavos ?? 0
   const porCategoria = summary?.despesasPorCategoria ?? []
   const totalCat = porCategoria.reduce((s, c) => s + c.total, 0)
-  const pctLimite = Math.min(100, Math.round((despesas / LIMITE_MENSAL) * 100))
   const recent = (recentRaw ?? []).slice(0, 5)
 
   const firstName = user?.nome.split(' ')[0]
@@ -155,17 +154,7 @@ export default function Dashboard() {
           </div>
         </Card>
 
-        <Card title="Limite mensal" subtitle={`${brl(despesas)} de ${brl(LIMITE_MENSAL)}`} className="lg:col-span-2">
-          <p className="text-4xl font-semibold tracking-tight">{pctLimite}%</p>
-          <div className="mt-3 h-3 overflow-hidden rounded-full bg-neutral-100">
-            <div className="h-3 rounded-full bg-orange-500" style={{ width: `${pctLimite}%` }} />
-          </div>
-          <p className="mt-3 text-sm text-neutral-500">
-            {despesas <= LIMITE_MENSAL
-              ? `Restam ${brl(LIMITE_MENSAL - despesas)} para gastar neste mês.`
-              : `Você passou ${brl(despesas - LIMITE_MENSAL)} do limite.`}
-          </p>
-        </Card>
+        <LimitCard despesas={despesas} className="lg:col-span-2" />
       </div>
 
       <Card title="Últimos lançamentos">

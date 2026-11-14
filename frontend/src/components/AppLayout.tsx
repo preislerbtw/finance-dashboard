@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 const links = [
   { to: '/', label: 'Visão geral', icon: LayoutDashboard, end: true },
   { to: '/transacoes', label: 'Transações', icon: Receipt, end: false },
+  { to: '/categorias', label: 'Categorias', icon: Receipt, end: false },
 ]
 
 // rótulo que aparece ao passar o mouse sobre um ícone

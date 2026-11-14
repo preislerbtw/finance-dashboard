@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto'
 import {
-  CategoryRepository, Repositories, TransactionRepository, UserRepository,
+  CategoryRepository, Repositories, SettingsRepository, TransactionRepository, UserRepository,
 } from '../interfaces'
-import { Category, Transaction, User } from '../../types'
+import { Category, Settings, Transaction, User } from '../../types'
 
 class InMemoryUserRepository implements UserRepository {
   private items: User[] = []
@@ -33,6 +33,14 @@ class InMemoryCategoryRepository implements CategoryRepository {
   }
   async findById(id: string) {
     return this.items.find((c) => c.id === id) ?? null
+  }
+  async update(id: string, data: Partial<Pick<Category, 'nome' | 'tipo' | 'cor'>>) {
+    const index = this.items.findIndex((c) => c.id === id)
+    this.items[index] = { ...this.items[index], ...data }
+    return this.items[index]
+  }
+  async delete(id: string) {
+    this.items = this.items.filter((c) => c.id !== id)
   }
 }
 
@@ -95,6 +103,21 @@ class InMemoryTransactionRepository implements TransactionRepository {
     }
     return [...totals].map(([day, despesas]) => ({ day, despesas }))
   }
+  async countByCategory(categoryId: string) {
+    return this.items.filter((t) => t.categoryId === categoryId).length
+  }
+}
+
+class InMemorySettingsRepository implements SettingsRepository {
+  private items = new Map<string, Settings>()
+
+  async get(userId: string) {
+    return this.items.get(userId) ?? { limiteMensalCentavos: 0 }
+  }
+  async save(userId: string, data: Settings) {
+    this.items.set(userId, data)
+    return data
+  }
 }
 
 export function createInMemoryRepositories(): Repositories {
@@ -102,5 +125,6 @@ export function createInMemoryRepositories(): Repositories {
     users: new InMemoryUserRepository(),
     categories: new InMemoryCategoryRepository(),
     transactions: new InMemoryTransactionRepository(),
+    settings: new InMemorySettingsRepository(),
   }
 }
