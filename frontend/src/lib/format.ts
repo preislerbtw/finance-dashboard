@@ -28,3 +28,16 @@ export const currentMonth = () => today().slice(0, 7)
 
 // 2026-11-08 -> 08/11/2026
 export const formatDate = (iso: string) => iso.split('-').reverse().join('/')
+
+// navegacao entre meses
+export function shiftMonth(month: string, delta: number) {
+  const [y, m] = month.split('-').map(Number)
+  const d = new Date(y, m - 1 + delta, 1)
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`
+}
+
+// '2026-11' -> 'novembro de 2026'
+export const monthLabel = (month: string) => {
+  const [y, m] = month.split('-').map(Number)
+  return new Date(y, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+}

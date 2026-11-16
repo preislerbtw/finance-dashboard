@@ -1,15 +1,17 @@
-import { LayoutDashboard, LogOut, Receipt } from 'lucide-react'
+import { LayoutDashboard, LogOut, Moon, Receipt, Sun, Tags } from 'lucide-react'
 import { ReactNode } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
+import ThemeToggle from './ThemeToggle'
 
 const links = [
   { to: '/', label: 'Visão geral', icon: LayoutDashboard, end: true },
   { to: '/transacoes', label: 'Transações', icon: Receipt, end: false },
-  { to: '/categorias', label: 'Categorias', icon: Receipt, end: false },
+  { to: '/categorias', label: 'Categorias', icon: Tags, end: false },
 ]
 
-// rótulo que aparece ao passar o mouse sobre um ícone
+// Rótulo que aparece ao passar o mouse sobre um ícone
 function Tip({ children }: { children: ReactNode }) {
   return (
     <span className="pointer-events-none absolute left-full z-10 ml-3 whitespace-nowrap rounded-lg bg-neutral-950 px-2.5 py-1 text-xs text-white opacity-0 transition group-hover:opacity-100">
@@ -20,6 +22,7 @@ function Tip({ children }: { children: ReactNode }) {
 
 export default function AppLayout() {
   const { user, logout } = useAuth()
+  const { theme, toggle } = useTheme()
 
   return (
     <div className="min-h-screen">
@@ -53,12 +56,14 @@ export default function AppLayout() {
         </div>
 
         <div className="flex w-16 flex-col items-center gap-2 rounded-full bg-white p-2 shadow-sm">
+          <ThemeToggle className="group relative h-11 w-11 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-950">
+            <Tip>{theme === 'dark' ? 'Tema Claro' : 'Tema Escuro'}</Tip>
+          </ThemeToggle>
           <div
             title={user?.nome}
             className="flex h-11 w-11 items-center justify-center rounded-full bg-orange-100 text-sm font-semibold text-orange-700"
           >
-            {/* {user?.nome.charAt(0).toUpperCase()} */}
-            J
+            {user?.nome.charAt(0).toUpperCase()}
           </div>
           <button
             onClick={logout}
@@ -71,20 +76,20 @@ export default function AppLayout() {
         </div>
       </aside>
 
-      {/* Conteúdo */}
+      {/* conteúdo */}
       <main className="px-4 pb-28 pt-6 lg:pb-10 lg:pl-28 lg:pr-6 lg:pt-8">
         <Outlet />
       </main>
 
-      {/* Barra inferior (celular) */}
-      <nav className="fixed inset-x-3 bottom-3 flex items-center justify-around rounded-2xl bg-neutral-950 p-2 text-white shadow-lg lg:hidden">
+      {/* barra inferior (celular) */}
+      <nav className="fixed inset-x-3 bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] flex items-center justify-around rounded-2xl bg-neutral-950 p-2 text-white shadow-lg lg:hidden">
         {links.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
             end={end}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-0.5 rounded-xl px-5 py-1.5 text-[11px] ${
+              `flex flex-col items-center gap-0.5 rounded-xl px-3.5 py-1.5 text-[11px] ${
                 isActive ? 'bg-orange-500 text-white' : 'text-neutral-400'
               }`
             }
@@ -93,7 +98,11 @@ export default function AppLayout() {
             {label}
           </NavLink>
         ))}
-        <button onClick={logout} className="flex flex-col items-center gap-0.5 px-5 py-1.5 text-[11px] text-neutral-400">
+        <button onClick={toggle} className="flex flex-col items-center gap-0.5 px-3.5 py-1.5 text-[11px] text-neutral-400">
+          {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          Tema
+        </button>
+        <button onClick={logout} className="flex flex-col items-center gap-0.5 px-3.5 py-1.5 text-[11px] text-neutral-400">
           <LogOut size={20} />
           Sair
         </button>
