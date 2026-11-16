@@ -14,6 +14,8 @@ const DEFAULT_CATEGORIES: Omit<Category, 'id' | 'userId'>[] = [
   { nome: 'Saúde', tipo: 'despesa', cor: '#ef4444' },
   { nome: 'Lazer', tipo: 'despesa', cor: '#ec4899' },
   { nome: 'Outros', tipo: 'despesa', cor: '#6b7280' },
+  { nome: 'Comida', tipo: 'despesa', cor: '#14b8a6' },
+  { nome: 'Presentes', tipo: 'despesa', cor: '#a855f7' },
 ]
 
 export class AuthService {
